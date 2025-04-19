@@ -3,17 +3,25 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {  
-    "dev": "ts-node-dev --inspect --transpile-only --ignore-watch node_modules src/server.ts"
+  "scripts": {
+    "dev": "ts-node-dev -r tsconfig-paths/register --inspect --transpile-only --ignore-watch node_modules src/shared/http/server.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
     "@types/node": "^22.14.1",
+    "prettier": "^3.5.3",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-async-errors": "^3.1.1"
   }
 }
