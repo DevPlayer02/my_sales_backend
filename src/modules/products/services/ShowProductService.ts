@@ -1,5 +1,5 @@
 import AppError from '@shared/errors/AppError';
-import { productsRepositories } from '../repositories/ProductsRepositories';
+import { productsRepositories } from '../database/repositories/ProductsRepositories';
 
 interface IShowProduct {
   id: string;
