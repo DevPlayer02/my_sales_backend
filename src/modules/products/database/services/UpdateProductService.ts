@@ -2,25 +2,35 @@ import AppError from '@shared/errors/AppError';
 import { Product } from '../entities/Product';
 import { productsRepositories } from '../repositories/ProductsRepositories';
 
-interface ICreateProduct {
+interface IUpdateProduct {
+  id: string;
   name: string;
   price: number;
   quantity: number;
 }
 
-export default class CreateProductService {
-  async execute({ name, price, quantity }: ICreateProduct): Promise<Product> {
+export default class UpdateProductService {
+  async execute({
+    id,
+    name,
+    price,
+    quantity,
+  }: IUpdateProduct): Promise<Product> {
+    const product = await productsRepositories.findById(id);
+
+    if (!product) {
+      throw new AppError('Product not found', 404);
+    }
+
     const productExists = await productsRepositories.findByName(name);
 
     if (productExists) {
       throw new AppError('There is already one product with this name', 409);
     }
 
-    const product = productsRepositories.create({
-      name,
-      price,
-      quantity,
-    });
+    product.name = name;
+    product.price = price;
+    product.quantity = quantity;
 
     await productsRepositories.save(product);
 
