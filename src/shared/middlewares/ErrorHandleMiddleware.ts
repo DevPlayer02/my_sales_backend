@@ -2,7 +2,7 @@ import AppError from '@shared/errors/AppError';
 import { NextFunction, Request, Response } from 'express';
 
 export default class ErrorHandleMiddleware {
-  public static handleError: Promise<void>(
+  public static handleError(
     err: Error,
     _req: Request,
     res: Response,

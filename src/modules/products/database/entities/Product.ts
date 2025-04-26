@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateCol
 
 @Entity('products')
 export class Product {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid') // coloquei uuid porque geralmente é isso, mas veja se seu banco é UUID mesmo
   id: string;
 
   @Column({ type: 'text' })
@@ -14,9 +14,9 @@ export class Product {
   @Column({ type: 'int' })
   quantity: number;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
 }
