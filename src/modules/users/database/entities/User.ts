@@ -6,19 +6,22 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('products')
-export class Product {
+@Entity('users')
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'text' })
+  @Column()
   name: string;
 
-  @Column({ type: 'decimal' })
-  price: number;
+  @Column()
+  email: string;
 
-  @Column({ type: 'int' })
-  quantity: number;
+  @Column()
+  password: string;
+
+  @Column()
+  avatar: string;
 
   @CreateDateColumn()
   created_at: Date;
