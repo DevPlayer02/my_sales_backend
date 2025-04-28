@@ -17,7 +17,7 @@ AppDataSource.initialize()
 
     app.use(routes);
     app.use(errors());
-    app.use(ErrorHandleMiddleware.handleError);
+    // app.use(ErrorHandleMiddleware.handleError);
 
     console.log('Database connected successfully');
 

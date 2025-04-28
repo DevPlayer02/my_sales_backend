@@ -7,7 +7,7 @@ export const productsRepositories = AppDataSource.getRepository(Product).extend(
       return this.findOneBy({ name });
     },
     async findById(id: string): Promise<Product | null> {
-      return this.findOneBy({ id: Number(id) });
+      return this.findOneBy({ id });
     },
   },
 );
