@@ -18,10 +18,12 @@ export default class UpdateUserAvatarService {
       throw new AppError("User not found", 404);
     }
 
+    console.log(avatarFileName)
+
     if (user.avatar) {
       const userAvatarFilePath = path.join(uploadConfig.directory, user.avatar);
       const userAvatarFileExists = await fs.promises.stat(userAvatarFilePath);
-
+      console.log('userAvatarFileExists',userAvatarFileExists)
       if (userAvatarFileExists) {
         await fs.promises.unlink(userAvatarFilePath);
       }
