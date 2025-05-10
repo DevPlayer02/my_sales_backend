@@ -45,9 +45,9 @@ export default class CreateOrderService {
       )[0].quantity < product.quantity;
     });
 
-    if (quantityAvailable.length) {
+    if (!quantityAvailable.length) {
       throw new AppError(
-        `The quantity ${quantityAvailable[0].quantity} is not available for ${quantityAvailable[0].id}.`,
+        "The quantity is not available for.",
         409,
       );
     }
