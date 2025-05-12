@@ -1,6 +1,6 @@
 import AppError from "@shared/errors/AppError";
-import { Order } from "../database/entities/Order";
-import { OrderRepostiories } from "../database/repositories/OrderRepositories";
+import { Order } from "../infra/database/entities/Order";
+import { OrderRepostiories } from "../infra/database/repositories/OrderRepositories";
 
 
 export default class ShowOrderService {
