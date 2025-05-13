@@ -3,12 +3,12 @@ import { usersRepositories } from '../infra/database/repositories/UsersRepositor
 import { userTokensRepositories } from '../infra/database/repositories/UserTokensRepositories';
 import { sendEmail } from '@config/email';
 
-interface IFortgotPassword {
+interface IForgotPassword {
   email: string;
 }
 
 export default class SendForgotPasswordEmailService {
-  async execute({ email }: IFortgotPassword): Promise<void> {
+  async execute({ email }: IForgotPassword): Promise<void> {
     const user = await usersRepositories.findByEmail(email);
 
     if (!user) {
