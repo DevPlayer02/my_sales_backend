@@ -2,12 +2,7 @@ import AppError from '@shared/errors/AppError';
 import { Product } from '../infra/database/entities/Product';
 import { productsRepositories } from '../infra/database/repositories/ProductsRepositories';
 import RedisCache from '@shared/cache/RedisCache';
-
-interface ICreateProduct {
-  name: string;
-  price: number;
-  quantity: number;
-}
+import { ICreateProduct } from '../domain/models/ICreateProduct';
 
 export default class CreateProductService {
   async execute({ name, price, quantity }: ICreateProduct): Promise<Product> {

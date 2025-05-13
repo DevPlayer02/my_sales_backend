@@ -3,12 +3,7 @@ import AppError from '@shared/errors/AppError';
 import { Order } from '../infra/database/entities/Order';
 import { productsRepositories } from '@modules/products/infra/database/repositories/ProductsRepositories';
 import { OrderRepostiories } from '../infra/database/repositories/OrderRepositories';
-import { Product } from '@modules/products/infra/database/entities/Product';
-
-interface ICreateOrder {
-  customer_id: string;
-  products: Product[];
-}
+import { ICreateOrder } from '../domain/models/ICreateOrder';
 
 export default class CreateOrderService {
   async execute({ customer_id, products }: ICreateOrder): Promise<Order> {
