@@ -1,13 +1,17 @@
-import { customerRepository } from '@modules/customers/infra/database/repositories/CustomerRepositories';
 import AppError from '@shared/errors/AppError';
 import { Order } from '../infra/database/entities/Order';
 import { productsRepositories } from '@modules/products/infra/database/repositories/ProductsRepositories';
-import { OrderRepostiories } from '../infra/database/repositories/OrderRepositories';
 import { ICreateOrder } from '../domain/models/ICreateOrder';
+import { IOrdersRepositories } from '../domain/repositories/IOrdersRepositories';
+import { ICustomersRepositories } from '@modules/customers/domain/repositories/ICustomersRepositories';
 
 export default class CreateOrderService {
+  constructor(
+    private readonly orderRepositories: IOrdersRepositories,
+    private readonly customerRepositories: ICustomersRepositories
+  ) { }
   async execute({ customer_id, products }: ICreateOrder): Promise<Order> {
-    const customerExists = await customerRepository.findById(
+    const customerExists = await this.customerRepositories.findById(
       Number(customer_id),
     );
 
@@ -55,10 +59,10 @@ export default class CreateOrderService {
       )[0].price,
     }));
 
-    const order = await OrderRepostiories.createOrder({
-      customer: customerExists,
-      products: serializedProducts,
-    });
+    const order = await this.orderRepositories.createOrder(
+      customerExists,
+      { products: serializedProducts }
+    );
 
     const { order_products } = order;
 
