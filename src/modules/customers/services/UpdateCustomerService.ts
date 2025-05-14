@@ -1,6 +1,6 @@
 import AppError from "@shared/errors/AppError";
-import { customerRepository } from "../infra/database/repositories/CustomerRepositories";
 import { Customer } from "../infra/database/entities/Customer";
+import { ICustomersRepositories } from "../domain/repositories/ICustomersRepositories";
 
 interface IUpdateCustomer {
   id: number;
@@ -9,14 +9,15 @@ interface IUpdateCustomer {
 }
 
 export default class UpdateCustomerService {
+  constructor(private readonly customerRepositories: ICustomersRepositories) { }
   public async execute({ id, name, email }: IUpdateCustomer): Promise<Customer> {
-    const customer = await customerRepository.findById(id);
+    const customer = await this.customerRepositories.findById(id);
 
     if (!customer) {
       throw new AppError("Customer not found", 404);
     }
 
-    const customerExists = await customerRepository.findByEmail(email);
+    const customerExists = await this.customerRepositories.findByEmail(email);
 
     if (customerExists && email !== customer.email) {
       throw new AppError("There is already one customer with this email.");
@@ -25,7 +26,7 @@ export default class UpdateCustomerService {
     customer.name = name;
     customer.email = email;
 
-    await customerRepository.save(customer);
+    await this.customerRepositories.save(customer);
 
     return customer;
   }
