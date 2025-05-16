@@ -4,14 +4,19 @@ import { productsRepositories } from '@modules/products/infra/database/repositor
 import { ICreateOrder } from '../domain/models/ICreateOrder';
 import { IOrdersRepositories } from '../domain/repositories/IOrdersRepositories';
 import { ICustomersRepositories } from '@modules/customers/domain/repositories/ICustomersRepositories';
+import { inject, injectable } from 'tsyringe';
 
+@injectable()
 export default class CreateOrderService {
   constructor(
+    @inject('OrdersRepository')
     private readonly orderRepositories: IOrdersRepositories,
-    private readonly customerRepositories: ICustomersRepositories
+
+    @inject('CustomersRepository')
+    private readonly customerRepository: ICustomersRepositories
   ) { }
   async execute({ customer_id, products }: ICreateOrder): Promise<Order> {
-    const customerExists = await this.customerRepositories.findById(
+    const customerExists = await this.customerRepository.findById(
       Number(customer_id),
     );
 
@@ -44,7 +49,7 @@ export default class CreateOrderService {
       )[0].quantity < product.quantity;
     });
 
-    if (!quantityAvailable.length) {
+    if (quantityAvailable.length) {
       throw new AppError(
         "The quantity is not available for.",
         409,

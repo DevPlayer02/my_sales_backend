@@ -1,10 +1,12 @@
 import AppError from "@shared/errors/AppError";
 import { Order } from "../infra/database/entities/Order";
 import { IOrdersRepositories } from "../domain/repositories/IOrdersRepositories";
+import { inject, injectable } from "tsyringe";
 
-
+@injectable()
 export default class ShowOrderService {
   constructor(
+    @inject('OrdersRepository')
     private readonly orderRepositories: IOrdersRepositories
   ) {}
   async execute(id: string): Promise<Order> {

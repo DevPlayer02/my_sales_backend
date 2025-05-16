@@ -1,8 +1,15 @@
 import RedisCache from '@shared/cache/RedisCache';
 import { Product } from '../infra/database/entities/Product';
-import { productsRepositories } from '../infra/database/repositories/ProductsRepositories';
+import { IProductsRepositories } from '../domain/repositories/IProductsRepositories';
+import { inject, injectable } from 'tsyringe';
 
+@injectable()
 export default class ListProductService {
+  constructor(
+      @inject('ProductsRepository')
+      private readonly productsRepositories: IProductsRepositories,
+    ) {}
+
   async execute(): Promise<Product[]> {
     const redisCache = new RedisCache();
 
@@ -11,7 +18,7 @@ export default class ListProductService {
     );
 
     if (!products) {
-      products = await productsRepositories.find();
+      products = await this.productsRepositories.find();
 
       await redisCache.save(
         'api-mysales-PRODUCTS_LIST',
