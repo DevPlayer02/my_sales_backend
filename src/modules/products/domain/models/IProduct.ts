@@ -1,7 +1,7 @@
 import { IOrdersProducts } from "@modules/orders/domain/models/IOrdersProducts";
 
 export interface IProduct {
-  id: string;
+  id: number;
   order_products: IOrdersProducts[];
   name: string;
   price: number;

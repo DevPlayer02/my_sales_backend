@@ -8,7 +8,7 @@ import { ICreateCustomer } from '@modules/customers/domain/models/ICreateUser';
 import { ICustomer } from '@modules/customers/domain/models/ICustomer';
 import { Repository } from 'typeorm';
 
-export default class customerRepositories implements ICustomersRepositories {
+export default class customerRepository implements ICustomersRepositories {
   private ormRepository: Repository<Customer>;
 
   constructor() {

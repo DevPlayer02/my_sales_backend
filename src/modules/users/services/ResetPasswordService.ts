@@ -1,23 +1,32 @@
 import AppError from '@shared/errors/AppError';
-import { usersRepositories } from '../infra/database/repositories/UsersRepositories';
-import { userTokensRepositories } from '../infra/database/repositories/UserTokensRepositories';
 import { isAfter, addHours } from 'date-fns';
 import { hash } from 'bcrypt';
+import { IUsersRepositories } from '../domain/repositories/IUsersRepositories';
+import { IUserTokensRepositories } from '../domain/repositories/IUserTokenRepositories';
+import { inject, injectable } from 'tsyringe';
 
 interface IResetPassword {
   token: string;
   password: string;
 }
 
+@injectable()
 export default class ResetPasswordService {
+  constructor(
+    @inject('UsersRepository')
+    private readonly usersRepositories: IUsersRepositories,
+    @inject('UserTokensRepository')
+    private readonly userTokensRepositories: IUserTokensRepositories
+  ) { }
+
   async execute({ token, password }: IResetPassword): Promise<void> {
-    const userToken = await userTokensRepositories.findByToken(token);
+    const userToken = await this.userTokensRepositories.findByToken(token);
 
     if (!userToken) {
       throw new AppError('User token not found', 404);
     }
 
-    const user = await usersRepositories.findById(userToken.user_id);
+    const user = await this.usersRepositories.findById(userToken.user_id);
 
     if (!user) {
       throw new AppError('User not found', 404);
@@ -32,6 +41,6 @@ export default class ResetPasswordService {
 
     user.password = await hash(password, 10);
 
-    await usersRepositories.save(user);
+    await this.usersRepositories.save(user);
   }
 }
