@@ -1,28 +1,32 @@
 import AppError from '@shared/errors/AppError';
-import { Product } from '../database/entities/Product';
-import { productsRepositories } from '../database/repositories/ProductsRepositories';
+import { Product } from '../infra/database/entities/Product';
+import { productsRepositories } from '../infra/database/repositories/ProductsRepositories';
+import RedisCache from '@shared/cache/RedisCache';
+import { IUpdateProduct } from '../domain/models/IUpdateProduct';
+import { IProductsRepositories } from '../domain/repositories/IProductsRepositories';
+import { inject, injectable } from 'tsyringe';
 
-interface IUpdateProduct {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-}
-
+@injectable()
 export default class UpdateProductService {
+  constructor(
+      @inject('ProductsRepository')
+      private readonly productsRepositories: IProductsRepositories,
+    ) {}
+
   async execute({
     id,
     name,
     price,
     quantity,
   }: IUpdateProduct): Promise<Product> {
-    const product = await productsRepositories.findById(id);
+    const redisCache = new RedisCache();
+    const product = await this.productsRepositories.findById(id);
 
     if (!product) {
       throw new AppError('Product not found', 404);
     }
 
-    const productExists = await productsRepositories.findByName(name);
+    const productExists = await this.productsRepositories.findByName(name);
 
     if (productExists) {
       throw new AppError('There is already one product with this name', 409);
@@ -32,7 +36,9 @@ export default class UpdateProductService {
     product.price = price;
     product.quantity = quantity;
 
-    await productsRepositories.save(product);
+    await this.productsRepositories.save(product);
+
+    await redisCache.invalidate('api-mysales-PRODUCTS_LIST');
 
     return product;
   }

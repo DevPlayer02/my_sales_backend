@@ -1,29 +1,29 @@
 import AppError from "@shared/errors/AppError";
-import { User } from "../database/entities/User";
-import { usersRepositories } from "../database/repositories/UsersRepositories";
 import path from "path";
 import fs from "fs";
 import uploadConfig from "@config/upload";
+import { IUpdateUserAvatar } from "../domain/models/IUpdateUserAvatar";
+import { IUsersRepositories } from "../domain/repositories/IUsersRepositories";
+import { IUser } from "../domain/models/IUser";
+import { inject, injectable } from "tsyringe";
 
-interface IUpdateUserAvatar {
-  userId: number;
-  avatarFileName: string;
-}
-
+@injectable()
 export default class UpdateUserAvatarService {
-  async execute({ userId, avatarFileName }: IUpdateUserAvatar): Promise<User> {
-    const user = await usersRepositories.findById(userId);
+  constructor(
+    @inject('UsersRepository')
+    private readonly usersRepositories: IUsersRepositories,
+  ) { }
+
+  async execute({ userId, avatarFileName }: IUpdateUserAvatar): Promise<IUser> {
+    const user = await this.usersRepositories.findById(userId);
 
     if (!user) {
       throw new AppError("User not found", 404);
     }
 
-    console.log(avatarFileName)
-
     if (user.avatar) {
       const userAvatarFilePath = path.join(uploadConfig.directory, user.avatar);
       const userAvatarFileExists = await fs.promises.stat(userAvatarFilePath);
-      console.log('userAvatarFileExists',userAvatarFileExists)
       if (userAvatarFileExists) {
         await fs.promises.unlink(userAvatarFilePath);
       }
@@ -31,7 +31,8 @@ export default class UpdateUserAvatarService {
 
     user.avatar = avatarFileName;
 
-    await usersRepositories.save(user);
+    await this.usersRepositories.save(user);
+
     return user;
   }
 }

@@ -1,34 +1,33 @@
 import AppError from "@shared/errors/AppError";
-import { User } from "../database/entities/User";
-import { usersRepositories } from "../database/repositories/UsersRepositories";
 import { compare } from "bcrypt";
 import { hash } from "bcrypt";
+import { IUpdateProfile } from "../domain/models/IUpdateProfile";
+import { IUsersRepositories } from "../domain/repositories/IUsersRepositories";
+import { IUser } from "../domain/models/IUser";
+import { inject, injectable } from "tsyringe";
 
-
-interface IUpdateProfile {
-  user_id: number;
-  name: string;
-  email: string;
-  password?: string;
-  old_password?: string;
-}
-
+@injectable()
 export default class UpdateProfileService {
+  constructor(
+    @inject('UsersRepository')
+    private readonly usersRepositories: IUsersRepositories,
+  ) { }
+
   async execute({
     user_id,
     name,
     email,
     password,
     old_password,
-  }: IUpdateProfile): Promise<User> {
-    const user = await usersRepositories.findById(user_id);
+  }: IUpdateProfile): Promise<IUser> {
+    const user = await this.usersRepositories.findById(user_id);
 
     if (!user) {
       throw new AppError("User not found.", 404);
     }
 
     if (email) {
-      const userUpdateEmail = await usersRepositories.findByEmail(email);
+      const userUpdateEmail = await this.usersRepositories.findByEmail(email);
       if (userUpdateEmail) {
         throw new AppError("Email already in use.", 409);
       }
@@ -54,7 +53,7 @@ export default class UpdateProfileService {
       user.name = name;
     }
 
-    await usersRepositories.save(user);
+    await this.usersRepositories.save(user);
 
     return user;
   }

@@ -1,18 +1,29 @@
 import AppError from '@shared/errors/AppError';
-import { productsRepositories } from '../database/repositories/ProductsRepositories';
+import RedisCache from '@shared/cache/RedisCache';
+import { IProductsRepositories } from '../domain/repositories/IProductsRepositories';
+import { inject, injectable } from 'tsyringe';
 
 interface IDeleteProduct {
-  id: string;
+  id: number;
 }
 
+@injectable()
 export default class DeleteProductService {
+  constructor(
+      @inject('ProductsRepository')
+      private readonly productsRepositories: IProductsRepositories,
+    ) {}
+
   async execute({ id }: IDeleteProduct): Promise<void> {
-    const product = await productsRepositories.findById(id);
+    const redisCache = new RedisCache();
+    const product = await this.productsRepositories.findById(id);
 
     if (!product) {
       throw new AppError('Product not found', 404);
     }
 
-    await productsRepositories.remove(product);
+    await redisCache.invalidate('api-mysales-PRODUCTS_LIST');
+
+    await this.productsRepositories.remove(product);
   }
 }
