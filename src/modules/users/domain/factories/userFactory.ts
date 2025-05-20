@@ -1,0 +1,1 @@
+export const userMock = { name: 'Jon Doe', email: 'john@gmail.com', password: '123456' };
