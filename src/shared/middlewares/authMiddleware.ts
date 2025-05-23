@@ -24,7 +24,7 @@ export default class AuthMiddleware {
       const { sub } = decodedToken as ITokenPayload;
 
       req.user = {
-        id: sub,
+        id: Number(sub),
       };
 
       return next();

@@ -1,10 +1,10 @@
 import AppError from '@shared/errors/AppError';
 import { Order } from '../infra/database/entities/Order';
-import { productsRepositories } from '@modules/products/infra/database/repositories/ProductsRepositories';
 import { ICreateOrder } from '../domain/models/ICreateOrder';
 import { IOrdersRepositories } from '../domain/repositories/IOrdersRepositories';
 import { ICustomersRepositories } from '@modules/customers/domain/repositories/ICustomersRepositories';
 import { inject, injectable } from 'tsyringe';
+import { IProductsRepositories } from '@modules/products/domain/repositories/IProductsRepositories';
 
 @injectable()
 export default class CreateOrderService {
@@ -13,7 +13,10 @@ export default class CreateOrderService {
     private readonly orderRepositories: IOrdersRepositories,
 
     @inject('CustomersRepository')
-    private readonly customerRepository: ICustomersRepositories
+    private readonly customerRepository: ICustomersRepositories,
+
+    @inject('ProductsRepository')
+    private readonly productsRepository: IProductsRepositories,
   ) { }
   async execute({ customer_id, products }: ICreateOrder): Promise<Order> {
     const customerExists = await this.customerRepository.findById(
@@ -24,7 +27,8 @@ export default class CreateOrderService {
       throw new AppError('Could not find any customer with the given id.');
     }
 
-    const existsProducts = await productsRepositories.findAllByIds(products);
+    const productIds = products.map(product => product.id);
+    const existsProducts = await this.productsRepository.findAllByIds(productIds);
 
     if (!existsProducts.length) {
       throw new AppError('Could not find any products with the given ids.');
@@ -57,7 +61,7 @@ export default class CreateOrderService {
     }
 
     const serializedProducts = products.map(product => ({
-      product_id: product.id,
+      product_id: product.id.toString(),
       quantity: product.quantity,
       price: existsProducts.filter(
         productExistent => productExistent.id === product.id,
@@ -72,14 +76,23 @@ export default class CreateOrderService {
     const { order_products } = order;
 
     const updatedProductsQuantity = order_products.map(product => ({
-      id: product.product_id,
+      id: Number(product.product_id),
       quantity:
         existsProducts.filter(
-          productExistent => productExistent.id === product.product_id,
+          productExistent => productExistent.id === Number(product.product_id),
         )[0].quantity - product.quantity,
     }));
 
-    await productsRepositories.save(updatedProductsQuantity);
+    for (const product of updatedProductsQuantity) {
+      await this.productsRepository.save({
+        ...product,
+        name: '',
+        price: 0,
+        order_products: [],
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
+    }
 
     return order;
   }

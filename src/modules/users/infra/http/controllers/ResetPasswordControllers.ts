@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 
 export default class ResetPasswordController {
-  async create(req: Request, res: Response): Promise<Response> {
+  async create(req: Request, res: Response): Promise<void> {
     const { password, token } = req.body;
 
     const resetPasswordService = container.resolve(ResetPasswordService)
@@ -13,6 +13,6 @@ export default class ResetPasswordController {
       token
     });
 
-    return res.status(204).json();
+    res.status(204).json();
   }
 }

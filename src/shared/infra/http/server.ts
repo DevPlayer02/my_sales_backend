@@ -9,27 +9,47 @@ import routes from './routes';
 import ErrorHandleMiddleware from '@shared/middlewares/ErrorHandleMiddleware';
 import rateLimiter from '@shared/middlewares/rateLimiter';
 import { AppDataSource } from '../typeorm/data-source';
+import { Request, Response, NextFunction } from 'express';
+import { ErrorRequestHandler } from 'express';
 
-AppDataSource.initialize()
-  .then(async () => {
-    const app = express();
+const startServer = async () => {
+  await AppDataSource.initialize();
 
-    app.use(cors());
-    app.use(express.json());
+  const app = express();
 
-    app.use(rateLimiter)
-    app.use(routes);
-    app.use(errors());
-    app.use(ErrorHandleMiddleware.handleError);
+  app.use(cors());
+  app.use(express.json());
 
-    console.log('Database connected successfully');
+  app.use(routes);
+  app.use(errors());
+  interface CustomError extends Error {
+    status?: number;
+  }
 
-    app.listen(3333, () => {
+  const errorHandler: ErrorRequestHandler = (
+    err: CustomError,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    ErrorHandleMiddleware.handleError(err, req, res, next);
+    return;
+  };
+
+  app.use(errorHandler);
+  app.use(rateLimiter);
+
+  console.log('Database connected successfully');
+
+  return app;
+};
+
+export default startServer()
+  .then(app => {
+    return app.listen(3333, () => {
       console.log('Server is running on port 3333');
     });
   })
   .catch(error => {
-    console.error('Failed to connect to the database:', error);
+    console.error('Failed to connect to the server:', error);
   });
-
-

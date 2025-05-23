@@ -3,14 +3,14 @@ import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 
 export default class ForgotPasswordController {
-  async create(req: Request, res: Response): Promise<Response> {
+  async create(req: Request, res: Response): Promise<void> {
     const { email } = req.body;
 
     const sendForgotPasswordEmailService = container.resolve(SendForgotPasswordEmailService)
 
     await sendForgotPasswordEmailService.execute({ email });
 
-    return res.status(204).json();
+    res.status(204).json();
   }
 }
 

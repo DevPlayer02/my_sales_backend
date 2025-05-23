@@ -53,4 +53,16 @@ export class productsRepositories implements IProductsRepositories {
 
     return product
   }
+
+  async findAllByIds(ids: number[]): Promise<IProduct[]> {
+    const productIds = ids.map(id => id);
+
+    const existsProducts = await this.ormRepository.find({
+      where: {
+        id: In(productIds),
+      },
+    });
+
+    return existsProducts;
+  }
 }

@@ -6,42 +6,41 @@ import UpdateCustomerService from '@modules/customers/services/UpdateCustomerSer
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 
-
 export default class CustomerControllers {
-  async index(req: Request, res: Response): Promise<Response> {
+  async index(req: Request, res: Response): Promise<void> {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const listCustomers = container.resolve(ListCustomersService);
     const customers = await listCustomers.execute(page, limit);
-    return res.json(customers);
+    res.json(customers);
   }
 
-  async show(req: Request, res: Response): Promise<Response> {
+  async show(req: Request, res: Response): Promise<void> {
     const id = Number(req.params.id);
     const showCustomer = container.resolve(ShowCustomerService);
     const customers = await showCustomer.execute({ id });
-    return res.json(customers);
+    res.json(customers);
   }
 
-  async create(req: Request, res: Response): Promise<Response> {
+  async create(req: Request, res: Response): Promise<void> {
     const { name, email } = req.body;
     const createCustomer = container.resolve(CreateCustomerService);
     const customers = await createCustomer.execute({ name, email });
-    return res.json(customers);
+    res.json(customers);
   }
 
-  async update(req: Request, res: Response): Promise<Response> {
+  async update(req: Request, res: Response): Promise<void> {
     const { name, email } = req.body;
     const id = Number(req.params.id);
     const updateCustomer = container.resolve(UpdateCustomerService);
     const customers = await updateCustomer.execute({ name, email, id });
-    return res.json(customers);
+    res.json(customers);
   }
 
-  async delete(req: Request, res: Response): Promise<Response> {
+  async delete(req: Request, res: Response): Promise<void> {
     const id = Number(req.params.id);
     const deleteCustomer = container.resolve(DeleteCustomerService);
     await deleteCustomer.execute({ id });
-    return res.status(204).json([]);
+    res.status(204).json([]);
   }
 }

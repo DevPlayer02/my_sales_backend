@@ -8,4 +8,5 @@ export interface IProductsRepositories {
   remove(product: IProduct): Promise<void>;
   find(): Promise<IProduct[]>;
   findByName(name: string): Promise<IProduct | null>;
+  findAllByIds(ids: number[]): Promise<IProduct[]>;
 }
